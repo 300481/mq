@@ -112,8 +112,6 @@ createTopicIfNotExists creates a Topic if its not existing
 and allowed to create one
 */
 func (m *GCP) createTopicIfNotExists(client *pubsub.Client, ctx context.Context) (topic *pubsub.Topic, err error) {
-	log.Printf("Topic don't exist, create one. Topic: %s\n", m.TopicName)
-
 	topic = client.Topic(m.TopicName)
 	ok, err := topic.Exists(ctx)
 	if err != nil {
@@ -121,6 +119,7 @@ func (m *GCP) createTopicIfNotExists(client *pubsub.Client, ctx context.Context)
 	}
 	if !ok {
 		if m.CreateTopic {
+			log.Printf("Topic don't exist, create one. Topic: %s\n", m.TopicName)
 			topic, err = client.CreateTopic(ctx, m.TopicName)
 			if err != nil {
 				return nil, err
@@ -137,8 +136,6 @@ createSubscriptionIfNotExists creates a Subscription if its not existing
 and allowed to create one
 */
 func (m *GCP) createSubscriptionIfNotExists(client *pubsub.Client, ctx context.Context) (topic *pubsub.Subscription, err error) {
-	log.Printf("Subscription don't exist, create one. Subscription: %s\n", m.SubscriptionName)
-
 	sub := client.Subscription(m.SubscriptionName)
 	ok, err := sub.Exists(ctx)
 	if err != nil {
@@ -146,6 +143,7 @@ func (m *GCP) createSubscriptionIfNotExists(client *pubsub.Client, ctx context.C
 	}
 	if !ok {
 		if m.CreateSubscription {
+			log.Printf("Subscription don't exist, create one. Subscription: %s\n", m.SubscriptionName)
 			topic, err := m.createTopicIfNotExists(client, ctx)
 			if err != nil {
 				return nil, err
