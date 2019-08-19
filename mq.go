@@ -3,6 +3,7 @@ package mq
 import (
 	"context"
 	"errors"
+	"log"
 	"os"
 	"time"
 
@@ -26,6 +27,7 @@ type GCP struct {
 
 // NewGCP creates new GCP PubSub struct
 func NewGCP() *GCP {
+	log.Println("Create GCP PubSub message queue config.")
 	return &GCP{
 		CredentialsFile:    os.Getenv("GCP_CREDENTIALS_FILE"),
 		TopicName:          os.Getenv("GCP_TOPIC_NAME"),
@@ -66,6 +68,7 @@ func (m *GCP) Publish(payload []byte) (id string, err error) {
 		return "", err
 	}
 
+	log.Printf("Published ID '%s' to GCP PubSub message queue.\n", id)
 	return id, nil
 }
 
@@ -80,6 +83,8 @@ Config needed:
 	"GCP_CREATE_SUBSCRIPTION"
 */
 func (m *GCP) Subscribe(handleFunc func(ctx context.Context, m *pubsub.Message)) (err error) {
+	log.Println("Subscribe to GCP PubSub message queue.")
+
 	ctx := context.Background()
 
 	opts := option.WithCredentialsFile(m.CredentialsFile)
@@ -107,6 +112,8 @@ createTopicIfNotExists creates a Topic if its not existing
 and allowed to create one
 */
 func (m *GCP) createTopicIfNotExists(client *pubsub.Client, ctx context.Context) (topic *pubsub.Topic, err error) {
+	log.Printf("Topic don't exist, create one. Topic: %s\n", m.TopicName)
+
 	topic = client.Topic(m.TopicName)
 	ok, err := topic.Exists(ctx)
 	if err != nil {
@@ -130,6 +137,8 @@ createSubscriptionIfNotExists creates a Subscription if its not existing
 and allowed to create one
 */
 func (m *GCP) createSubscriptionIfNotExists(client *pubsub.Client, ctx context.Context) (topic *pubsub.Subscription, err error) {
+	log.Printf("Subscription don't exist, create one. Subscription: %s\n", m.SubscriptionName)
+
 	sub := client.Subscription(m.SubscriptionName)
 	ok, err := sub.Exists(ctx)
 	if err != nil {
