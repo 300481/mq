@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"log"
-	"os"
 	"time"
 
 	"cloud.google.com/go/pubsub"
@@ -25,27 +24,7 @@ type GCP struct {
 	ProjectID          string
 }
 
-// NewGCP creates new GCP PubSub struct
-func NewGCP() *GCP {
-	log.Println("Create GCP PubSub message queue config.")
-	return &GCP{
-		CredentialsFile:    os.Getenv("GCP_CREDENTIALS_FILE"),
-		TopicName:          os.Getenv("GCP_TOPIC_NAME"),
-		CreateTopic:        os.Getenv("GCP_CREATE_TOPIC") == "TRUE",
-		SubscriptionName:   os.Getenv("GCP_SUBSCRIPTION_NAME"),
-		CreateSubscription: os.Getenv("GCP_CREATE_SUBSCRIPTION") == "TRUE",
-		ProjectID:          os.Getenv("GCP_PROJECT_ID"),
-	}
-}
-
-/*
-Publish publishes a message on GCP PubSub
-Config needed:
-	"GCP_PROJECT_ID"
-	"GCP_CREDENTIALS_FILE"
-	"GCP_TOPIC_NAME"
-	"GCP_CREATE_TOPIC"
-*/
+// Publish publishes a message on GCP PubSub
 func (m *GCP) Publish(payload []byte) (id string, err error) {
 	ctx := context.Background()
 
@@ -72,16 +51,7 @@ func (m *GCP) Publish(payload []byte) (id string, err error) {
 	return id, nil
 }
 
-/*
-Subscribe subscribes to an existing subscription
-Config needed:
-	"GCP_PROJECT_ID"
-	"GCP_CREDENTIALS_FILE"
-	"GCP_TOPIC_NAME"
-	"GCP_CREATE_TOPIC"
-	"GCP_SUBSCRIPTION_NAME"
-	"GCP_CREATE_SUBSCRIPTION"
-*/
+// Subscribe subscribes to an existing subscription
 func (m *GCP) Subscribe(handleFunc func(ctx context.Context, m *pubsub.Message)) (err error) {
 	log.Println("Subscribe to GCP PubSub message queue.")
 
